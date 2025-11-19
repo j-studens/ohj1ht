@@ -24,14 +24,14 @@ public class ohj1ht_peli : PhysicsGame
     public override void Begin()
     {
         Gravity = new Vector(0, -1000);
-
+        //Testikommentti
         LuoKentta();
         LisaaNappaimet();
 
         Camera.Follow(pelaaja1);
         Camera.ZoomFactor = 1.2;
         Camera.StayInLevel = true;
-
+        
         MasterVolume = 0.5;
     }
 

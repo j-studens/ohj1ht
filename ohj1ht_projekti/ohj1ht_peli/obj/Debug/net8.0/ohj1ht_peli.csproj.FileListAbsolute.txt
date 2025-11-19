@@ -54,3 +54,4 @@ C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debu
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debug\net8.0\ohj1ht_peli.pdb
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debug\net8.0\ohj1ht_peli.genruntimeconfig.cache
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debug\net8.0\ref\ohj1ht_peli.dll
+C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debug\net8.0\ohj1ht_peli.sourcelink.json
