@@ -12,100 +12,267 @@ using Jypeli.Widgets;
 /// </summary>
 public class ohj1ht_peli : PhysicsGame
 {
+    int kenttaNro = 1;
+    private const int pisteraja1 = 4;
+    private const int pisteraja2 = 7;
+    private const int pisteraja3 = 9;
+    private const int pisteraja4 = 11;
+    private const int pisteraja5 = 13;
+    private const int pisteraja6 = 15;
+    
+    
+    IntMeter pelaajanPisteet;
     private const double NOPEUS = 200;
     private const double HYPPYNOPEUS = 750;
     private const int RUUDUN_KOKO = 40;
 
-    private PlatformCharacter pelaaja1;
-
+    private Image VihollinenKuva = LoadImage("norsu.png");
     private Image pelaajanKuva = LoadImage("norsu.png");
     private Image tahtiKuva = LoadImage("tahti.png");
+    private PlatformCharacter pelaaja1;
+    private PlatformCharacter vihollinen;
+    private PhysicsObject nyrkki;
 
     public override void Begin()
     {
-        Gravity = new Vector(0, -1000);
-        //Testikommentti
-        LuoKentta();
-        LisaaNappaimet();
 
-        Camera.Follow(pelaaja1);
-        Camera.ZoomFactor = 1.2;
-        Camera.StayInLevel = true;
-        
-        MasterVolume = 0.5;
+        LuoKentta("kentta1.txt");
+
     }
 
-    private void LuoKentta()
+    void LuoKentta(string seuraavakentta)
     {
-        TileMap kentta = TileMap.FromLevelAsset("kentta1.txt");
+        Gravity = new Vector(0, -1000);
+        TileMap kentta = TileMap.FromLevelAsset(seuraavakentta);
         kentta.SetTileMethod('#', LisaaTaso);
-        kentta.SetTileMethod('*', LisaaTahti);
+        kentta.SetTileMethod('*', LisääLahja);
+        kentta.SetTileMethod('@', LisaaVihollinen);
         kentta.SetTileMethod('N', LisaaPelaaja);
         kentta.Execute(RUUDUN_KOKO, RUUDUN_KOKO);
         Level.CreateBorders();
-        Level.Background.CreateGradient(Color.White, Color.SkyBlue);
+        Level.Background.CreateGradient(Color.DarkBlue, Color.SkyBlue);
+        Surface alareuna = Surface.CreateBottom(Level, 30, 100, 40);
+        Add(alareuna);
+        LisaaNappaimet();
+        LuoLaskuri();
+        Camera.Follow(pelaaja1);
+        Camera.ZoomFactor = 1.2;
+        Camera.StayInLevel = true;
+        MasterVolume = 0.5;
     }
 
-    private void LisaaTaso(Vector paikka, double leveys, double korkeus)
+
+
+     void LisaaNappaimet()
+    {
+
+        Keyboard.Listen(Key.Space, ButtonState.Pressed, LisaaNyrkki, "555", pelaaja1, -NOPEUS);
+        Keyboard.Listen(Key.Left, ButtonState.Down, Liikuta, "Liikkuu vasemmalle", pelaaja1, -NOPEUS);
+        Keyboard.Listen(Key.Right, ButtonState.Down, Liikuta, "Liikkuu vasemmalle", pelaaja1, NOPEUS);
+        Keyboard.Listen(Key.Up, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", pelaaja1, HYPPYNOPEUS);
+        
+        
+        Keyboard.Listen(Key.F1, ButtonState.Pressed, ShowControlHelp, "Näytä ohjeet");
+        Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
+        PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
+    }
+
+    void Liikuta(PlatformCharacter hahmo, double nopeus)
+    {
+        hahmo.Walk(nopeus);
+    }
+
+    void Hyppaa(PlatformCharacter hahmo, double nopeus)
+    {
+        hahmo.Jump(nopeus);
+    }
+    
+    void LisaaNyrkki(PlatformCharacter hahmo, double nopeus)
+    {
+        nyrkki = new PlatformCharacter(60, 60);
+        nyrkki.X = hahmo.X + 20;
+        nyrkki.Y = hahmo.Y;
+        nyrkki.Image = pelaajanKuva;
+        nyrkki.Tag = "nyrkki";
+        nyrkki.LifetimeLeft = TimeSpan.FromSeconds( 0.05 );
+        Add(nyrkki);
+    }
+
+    
+    void LisaaTaso(Vector paikka, double leveys, double korkeus)
     {
         PhysicsObject taso = PhysicsObject.CreateStaticObject(leveys, korkeus);
         taso.Position = paikka;
-        taso.Color = Color.Green;
+        taso.Color = Color.White;
         Add(taso);
     }
-
-    private void LisaaTahti(Vector paikka, double leveys, double korkeus)
-    {
-        PhysicsObject tahti = PhysicsObject.CreateStaticObject(leveys, korkeus);
-        tahti.IgnoresCollisionResponse = true;
-        tahti.Position = paikka;
-        tahti.Image = tahtiKuva;
-        tahti.Tag = "tahti";
-        Add(tahti);
-    }
-
-    private void LisaaPelaaja(Vector paikka, double leveys, double korkeus)
+    /// <summary>
+    /// Aliohjelma, joka luo pelaajahahmon
+    /// </summary>
+    /// <param name="paikka"></param>
+    /// <param name="leveys"></param>
+    /// <param name="korkeus"></param>
+    void LisaaPelaaja(Vector paikka, double leveys, double korkeus)
     {
         pelaaja1 = new PlatformCharacter(leveys, korkeus);
         pelaaja1.Position = paikka;
         pelaaja1.Mass = 4.0;
         pelaaja1.Image = pelaajanKuva;
-        AddCollisionHandler(pelaaja1, "tahti", TormaaTahteen);
+        AddCollisionHandler(pelaaja1, "Lahja", LahjaTörmäys);
+        AddCollisionHandler(pelaaja1, "vihollinen", VihollinenTörmäys);
         Add(pelaaja1);
     }
-
-    private void LisaaNappaimet()
+    
+    
+    void VihollinenTörmäys(PhysicsObject pelaaja, PhysicsObject vihollinen)
     {
-        Keyboard.Listen(Key.F1, ButtonState.Pressed, ShowControlHelp, "Näytä ohjeet");
-        Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
-
-        Keyboard.Listen(Key.Left, ButtonState.Down, Liikuta, "Liikkuu vasemmalle", pelaaja1, -NOPEUS);
-        Keyboard.Listen(Key.Right, ButtonState.Down, Liikuta, "Liikkuu vasemmalle", pelaaja1, NOPEUS);
-        Keyboard.Listen(Key.Up, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", pelaaja1, HYPPYNOPEUS);
-
-        ControllerOne.Listen(Button.Back, ButtonState.Pressed, Exit, "Poistu pelistä");
-
-        ControllerOne.Listen(Button.DPadLeft, ButtonState.Down, Liikuta, "Pelaaja liikkuu vasemmalle", pelaaja1,
-            -NOPEUS);
-        ControllerOne.Listen(Button.DPadRight, ButtonState.Down, Liikuta, "Pelaaja liikkuu oikealle", pelaaja1, NOPEUS);
-        ControllerOne.Listen(Button.A, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", pelaaja1, HYPPYNOPEUS);
-
-        PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
+        Explosion rajahdys = new Explosion(50);
+        rajahdys.Position = pelaaja.Position;
+        Add(rajahdys);
+        pelaaja.Destroy();
+        
+        
+    }
+    
+    
+    void NyrkkiTörmäys(PhysicsObject vihollinen, PhysicsObject nyrkki)
+    {
+        Explosion rajahdys = new Explosion(50);
+        rajahdys.Position = vihollinen.Position;
+        Add(rajahdys);
+        vihollinen.Destroy();
+        pelaajanPisteet.Value += 1;
+        
+        kenttaNro++;
+        SeuraavaKentta();
+    }
+    
+    void LisaaVihollinen(Vector paikka, double leveys, double korkeus)
+    {
+        vihollinen = new PlatformCharacter(leveys, korkeus);
+        vihollinen.Position = paikka;
+        vihollinen.Mass = 4.0;
+        vihollinen.Image = pelaajanKuva;
+        vihollinen.Tag = "vihollinen";
+        AddCollisionHandler(vihollinen, "nyrkki", NyrkkiTörmäys);
+        Add(vihollinen);
     }
 
-    private void Liikuta(PlatformCharacter hahmo, double nopeus)
+    
+    /// LAHJAT
+    /// <summary>
+    /// Aliohjelma, joka luo lahjat kenttään
+    /// </summary>
+    /// <param name="paikka"></param>
+    /// <param name="leveys"></param>
+    /// <param name="korkeus"></param>
+    void LisääLahja(Vector paikka, double leveys, double korkeus)
     {
-        hahmo.Walk(nopeus);
+        PhysicsObject Lahja = PhysicsObject.CreateStaticObject(leveys, korkeus);
+        Lahja.IgnoresCollisionResponse = true;
+        Lahja.Position = paikka;
+        Lahja.Image = tahtiKuva;
+        Lahja.Tag = "Lahja";
+        Add(Lahja);
     }
-
-    private void Hyppaa(PlatformCharacter hahmo, double nopeus)
+        
+    /// LAHJAT
+    /// <summary>
+    /// Aliohjelma, joka määrittä sen mitä tapahtuu törmäystapauksessa. Samalla lisää pisteen 
+    /// </summary>
+    /// <param name="hahmo"></param>
+    /// <param name="tahti"></param>
+    void LahjaTörmäys(PhysicsObject hahmo, PhysicsObject tahti)
     {
-        hahmo.Jump(nopeus);
-    }
-
-    private void TormaaTahteen(PhysicsObject hahmo, PhysicsObject tahti)
-    {
-        MessageDisplay.Add("Keräsit tähden!");
+        MessageDisplay.Add("Sait Lahjan!");
         tahti.Destroy();
+        pelaajanPisteet.Value += 1;
+    }
+    
+    void RajaYlitetty()
+    {
+        switch (pelaajanPisteet.Value)
+        {
+            case pisteraja1:
+                MessageDisplay.Add("Killing spree!");
+                break;
+            case pisteraja2:
+                MessageDisplay.Add("Rampage!");
+                break;
+            case pisteraja3:
+                MessageDisplay.Add("Dominating!");
+                break;
+            case pisteraja4:
+                MessageDisplay.Add("Unstoppable!");
+                break;
+            case pisteraja5:
+                MessageDisplay.Add("Godlike!");
+                break;
+            case pisteraja6:
+                MessageDisplay.Add("Wicked Sick!!");
+                kenttaNro++;
+                break;
+        }
+    }
+    
+    /// PISTEET
+    /// <summary>
+    /// Aliohjelma, joka lisää pistelaskurin
+    /// </summary>
+    void LuoLaskuri()
+    {
+        pelaajanPisteet = LuoPisteLaskuri(Screen.Right - 100.0, Screen.Top - 100.0);
+        pelaajanPisteet.Value = 0;
+        pelaajanPisteet.MaxValue = 30;
+        pelaajanPisteet.MinValue = 0;
+        pelaajanPisteet.AddTrigger(pisteraja1, TriggerDirection.Up, RajaYlitetty);
+        pelaajanPisteet.AddTrigger(pisteraja2, TriggerDirection.Up, RajaYlitetty);
+        pelaajanPisteet.AddTrigger(pisteraja3, TriggerDirection.Up, RajaYlitetty);
+        pelaajanPisteet.AddTrigger(pisteraja4, TriggerDirection.Up, RajaYlitetty);
+        pelaajanPisteet.AddTrigger(pisteraja5, TriggerDirection.Up, RajaYlitetty);
+        pelaajanPisteet.AddTrigger(pisteraja6, TriggerDirection.Up, RajaYlitetty);
+    }
+    
+    /// PISTEET
+    /// <summary>
+    /// Aliohjelma, joka luo pistelaskurin
+    /// </summary>
+    IntMeter LuoPisteLaskuri(double x, double y)
+    {
+        IntMeter laskuri = new IntMeter(0);
+        laskuri.MaxValue = 100;
+
+        Label naytto = new Label();
+        naytto.BindTo(laskuri);
+        naytto.X = x;
+        naytto.Y = y;
+        naytto.TextColor = Color.White;
+        naytto.BorderColor = Color.Black;
+        naytto.Color = Color.Green;
+        naytto.Title = "Pisteet: ";
+        Add(naytto);
+        return laskuri;
+    }
+    
+    void SeuraavaKentta()
+    {
+        ClearAll();
+        
+        switch (kenttaNro)
+        {
+            case 1:
+                LuoKentta("kentta1.txt");
+                break;
+            case 2:
+                LuoKentta("kentta2.txt");
+                break;
+            case 3:
+                LuoKentta("kentta3.txt");
+                break;
+            case 4:
+                Exit();
+                break;
+        }
     }
 }
+    
