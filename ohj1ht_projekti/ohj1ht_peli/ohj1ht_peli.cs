@@ -26,12 +26,13 @@ public class ohj1ht_peli : PhysicsGame
     private const double HYPPYNOPEUS = 750;
     private const int RUUDUN_KOKO = 40;
 
-    private Image VihollinenKuva = LoadImage("norsu.png");
-    private Image pelaajanKuva = LoadImage("norsu.png");
-    private Image tahtiKuva = LoadImage("tahti.png");
+    private Image VihollinenKuva = LoadImage("ilkeä_ukko.png");
+    private Image pelaajanKuva = LoadImage("jere_default.png");
+    private Image tahtiKuva = LoadImage("lahja.png");
     private PlatformCharacter pelaaja1;
     private PlatformCharacter vihollinen;
     private PhysicsObject nyrkki;
+
 
     public override void Begin()
     {
@@ -134,7 +135,11 @@ public class ohj1ht_peli : PhysicsGame
         
     }
     
-    
+    /// <summary>
+    /// Aliohjelma, joak käsittelee nyrkkitörmäystapausta
+    /// </summary>
+    /// <param name="vihollinen"></param>
+    /// <param name="nyrkki"></param>
     void NyrkkiTörmäys(PhysicsObject vihollinen, PhysicsObject nyrkki)
     {
         Explosion rajahdys = new Explosion(50);
@@ -143,8 +148,6 @@ public class ohj1ht_peli : PhysicsGame
         vihollinen.Destroy();
         pelaajanPisteet.Value += 1;
         
-        kenttaNro++;
-        SeuraavaKentta();
     }
     
     void LisaaVihollinen(Vector paikka, double leveys, double korkeus)
@@ -152,7 +155,7 @@ public class ohj1ht_peli : PhysicsGame
         vihollinen = new PlatformCharacter(leveys, korkeus);
         vihollinen.Position = paikka;
         vihollinen.Mass = 4.0;
-        vihollinen.Image = pelaajanKuva;
+        vihollinen.Image = VihollinenKuva;
         vihollinen.Tag = "vihollinen";
         AddCollisionHandler(vihollinen, "nyrkki", NyrkkiTörmäys);
         Add(vihollinen);
@@ -211,6 +214,7 @@ public class ohj1ht_peli : PhysicsGame
             case pisteraja6:
                 MessageDisplay.Add("Wicked Sick!!");
                 kenttaNro++;
+                SeuraavaKentta();
                 break;
         }
     }
@@ -275,4 +279,13 @@ public class ohj1ht_peli : PhysicsGame
         }
     }
 }
-    
+   
+//ylhäältä while loop 
+//WHILE --- CREATE INFINITE EVIL SNOWFLAKE BOMBS
+// NO COLLISION WITH ENEMY PLAYER AND PLATFORMS
+// GRAVITY BOUND
+// REMOVE WHEN AT THE BOTTOM
+// DESTROY EXPLODE WHEN HIT PLAYER
+// GENERATE AT RANDOM X AXIS, ALWAYS GENERATE AT SAME Y AXIS
+// RANDOM IS A FUNKTION ( DONT INVENT WHEEL AGAIN)
+// SNOWFALL 
