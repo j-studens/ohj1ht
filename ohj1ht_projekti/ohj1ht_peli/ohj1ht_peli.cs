@@ -21,6 +21,7 @@ public class ohj1ht_peli : PhysicsGame
     
     // Kenttä attribuutti.
     private int _kenntaNro = 1;
+    private bool _aiheuttikoKuolema;
     
     // Fysiikka-attribuutit.
     private const double Nopeus = 200;
@@ -31,22 +32,111 @@ public class ohj1ht_peli : PhysicsGame
     private static readonly string[] KenttaTaulukko ={"kentta1.txt","kentta2.txt","kentta3.txt"};
     
     // Kuvataulukko. 
-    private Image[] _kuvaTaulukko = {LoadImage("ilkeä_ukko.png"),LoadImage("jere_default.png"),LoadImage("lahja.png")};
+    private Image[] _kuvaTaulukko = {LoadImage("ilkeä_ukko.png"),LoadImage("jere_default.png"),LoadImage("lahja.png"),LoadImage("joulupukki.png")};
     
+    // Valikkotaulukko
+    private string[] _alkuvaihtoehdot = { "Aloita peli", "Lopeta" };
+    private string[] _toisetvaihtoehdot = { "Jatka peli", "Lopeta" };
     
     // Olio-attribuutit
     private PlatformCharacter _pelaaja1;
     private PlatformCharacter _vihollinen;
+    private PlatformCharacter _joulupukki;
     private PhysicsObject _nyrkki;
 
-
+    /// <summary>
+    /// Syöttöpiste.
+    /// </summary>
     public override void Begin()
     {
-
-        LuoKentta("kentta1.txt");
-
+        LisaaValikko(_alkuvaihtoehdot);
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: VALIKKO | Aliohjelma, joka luo alkuvalikon.
+    /// </summary>
+    private void LisaaValikko(string[] vaihtoehdot)
+    {
+        
+        int valikkoY = 0;
+        Color valikkoVäri = Color.DarkGreen;
+        
+        // Toteuttaa muulloin kuin pelaajan kuoleman seurauksena.
+        if (!_aiheuttikoKuolema)
+        {
+            ClearAll();
+            Level.Background.CreateGradient(Color.LightBlue, Color.DarkBlue);   
+            
+            // Luodaan otsikko
+            Label otsikko = new Label("LUMIUKKO FIGHTER"); 
+            otsikko.Y = 180; 
+            otsikko.Font = new Font(100, true);
+            otsikko.TextColor = Color.White;
+            Add(otsikko);
+        }
+        
+        MultiSelectWindow alkuvalikko = new MultiSelectWindow("", vaihtoehdot);
+        
+        // Toteuttaa, jos aliohjelma kutsuttiin pelaajan kuoleman seurauksena.
+        if (_aiheuttikoKuolema)
+        {
+            valikkoY = -125;
+            valikkoVäri = Color.Red;
+        }
+        
+        alkuvalikko.X = 0;
+        alkuvalikko.Y = valikkoY;
+        alkuvalikko.Color = valikkoVäri;
+        alkuvalikko.CapturesMouse = false;
+        alkuvalikko.AddItemHandler(0, KenttaSeuraava);
+        alkuvalikko.AddItemHandler(1, Exit);
+        Add(alkuvalikko);
+        
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: VALIKKO | Aliohjelma, joka kutsuu ohjelman LisaaValikko, mutta antaa toisenlaisen argumentin.
+    /// Mitä tämä saavuttaa: pelin valikossa näkyy "Aloita peli" sijaan "Jatka peli".
+    /// Kenttänumero jää kuitenkin talteen.
+    /// </summary>
+    private void ValikkoSeuraava()
+    {
+        LisaaValikko(_toisetvaihtoehdot);
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: VALIKKO | Aliohjelma, joka kutsuu toisen aliohjelman: SeuraavaKentta. 
+    /// </summary>
+    private void KenttaSeuraava()
+    {
+        SeuraavaKentta();
     }
 
+    
+    /// <summary>
+    /// Kategoria: VALIKKO | Aliohjelma, joka käsittelee kuolematapausta. Luo erilaisen valikon
+    /// </summary>
+    private void OletKuollut()
+    {
+        // Poistetaan kaikki ja asetetaan uusi taustaväri
+        ClearAll();
+        Level.Background.CreateGradient(Color.Red, Color.DarkRed);  
+        
+        // Luodaan otsikko
+        Label otsikko = new Label("KUOLIT"); 
+        otsikko.Y = 50; 
+        otsikko.Font = new Font(100, true); 
+        Add(otsikko);
+        
+        _aiheuttikoKuolema = true;
+        
+        // Kutsutaan valikko.
+        Timer.CreateAndStart(0.5, ValikkoSeuraava);
+    }
+    
     
     /// <summary>
     /// Kategoria: PELIKENTTÄ | Aliohejlma, joka luo varsinaisen pelikentän.
@@ -57,30 +147,26 @@ public class ohj1ht_peli : PhysicsGame
         // Painovoima & fysiikka
         Gravity = new Vector(0, -1000);
         
+        // Asettaa muuttujan lepotilaan, jotta valikkojen ulkonäkö pysyisi järkevänä
+        _aiheuttikoKuolema = false;
+            
         // Pelikentän omaisuudet.
         TileMap kentta = TileMap.FromLevelAsset(seuraavakentta);
         kentta.SetTileMethod('#', LisaaTaso);
         kentta.SetTileMethod('*', LisaaLahja);
         kentta.SetTileMethod('@', LisaaVihollinen);
         kentta.SetTileMethod('N', LisaaPelaaja);
+        kentta.SetTileMethod('J', LisaaJoulupukki);
         kentta.Execute(RuudunKoko, RuudunKoko);
         
-        // Pelikentän reunat
-        Level.CreateBorders();
-        Level.Background.CreateGradient(Color.DarkBlue, Color.SkyBlue);
-        Surface alareuna = Surface.CreateBottom(Level, 30, 100, 40);
-        
         // Kutsut
-        Add(alareuna);
         LisaaNappaimet();
         LuoLaskuri();
-        
-        // Pätkä, joka asettaa zoomauksen pelaajahahmoon.
-        Camera.Follow(_pelaaja1);
-        Camera.ZoomFactor = 1.2;
-        Camera.StayInLevel = true;
-        MasterVolume = 0.5;
+        LisaaReunat();
+        LisaaZoomaus();
+
     }
+    
     
     /// <summary>
     /// Kategoria: PELIKENTTÄ | Ohjelma, joka luo tason. Kutsuttava.
@@ -94,6 +180,30 @@ public class ohj1ht_peli : PhysicsGame
         taso.Position = paikka;
         taso.Color = Color.White;
         Add(taso);
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: PELIKENTTÄ | Aliohjelma, joka asettaa zoomauksen pelaajaan.
+    /// </summary>
+    private void LisaaZoomaus()
+    {
+        Camera.Follow(_pelaaja1);
+        Camera.ZoomFactor = 1.2;
+        Camera.StayInLevel = true;
+        MasterVolume = 0.5;
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: PELIKENTTÄ | Aliohjelma, joka asettaa reunat.
+    /// </summary>
+    private void LisaaReunat()
+    {
+        Level.CreateBorders();
+        Level.Background.CreateGradient(Color.DarkBlue, Color.SkyBlue);
+        Surface alareuna = Surface.CreateBottom(Level, 30, 100, 40);
+        Add(alareuna);
     }
     
     
@@ -129,15 +239,14 @@ public class ohj1ht_peli : PhysicsGame
     private void LisaaNappaimet()
     {
 
-        Keyboard.Listen(Key.Space, ButtonState.Pressed, LisaaNyrkki, "555", _pelaaja1, -Nopeus);
-        Keyboard.Listen(Key.Left, ButtonState.Down, Liikuta, "Liikkuu vasemmalle", _pelaaja1, -Nopeus);
-        Keyboard.Listen(Key.Right, ButtonState.Down, Liikuta, "Liikkuu vasemmalle", _pelaaja1, Nopeus);
-        Keyboard.Listen(Key.Up, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", _pelaaja1, HyppyNopeus);
+        Keyboard.Listen(Key.Space, ButtonState.Pressed, LisaaNyrkki, "Nyrkkeile", _pelaaja1, -Nopeus);
+        Keyboard.Listen(Key.Left, ButtonState.Down, Liikuta, "Liiku", _pelaaja1, -Nopeus);
+        Keyboard.Listen(Key.Right, ButtonState.Down, Liikuta, "Liiku", _pelaaja1, Nopeus);
+        Keyboard.Listen(Key.Up, ButtonState.Pressed, Hyppaa, "Hyppää", _pelaaja1, HyppyNopeus);
         
         
         Keyboard.Listen(Key.F1, ButtonState.Pressed, ShowControlHelp, "Näytä ohjeet");
-        Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
-        PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
+        Keyboard.Listen(Key.Escape, ButtonState.Pressed, ValikkoSeuraava, "Takaisin Valikkoon");
     }
 
     
@@ -228,9 +337,10 @@ public class ohj1ht_peli : PhysicsGame
     {
         Explosion rajahdys = new Explosion(50);
         rajahdys.Position = pelaaja.Position;
+        
         Add(rajahdys);
         pelaaja.Destroy();
-        Exit();
+        Timer.CreateAndStart(0.3, OletKuollut);
         
     }
     
@@ -249,8 +359,27 @@ public class ohj1ht_peli : PhysicsGame
         _vihollinen.Mass = 4.0;
         _vihollinen.Image = _kuvaTaulukko[0];
         _vihollinen.Tag = "vihollinen";
+        
         AddCollisionHandler(_vihollinen, "nyrkki", NyrkkiTörmäys);
         Add(_vihollinen);
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: VIHOLLINEN | Aliohjelma, joka luo joulupukin kenttään.
+    /// Samalla asettaa viholliselle törmäysehdon.
+    /// </summary>
+    /// <param name="paikka"></param>
+    /// <param name="leveys"></param>
+    /// <param name="korkeus"></param>
+    private void LisaaJoulupukki(Vector paikka, double leveys, double korkeus)
+    {
+        _joulupukki = new PlatformCharacter(leveys, korkeus);
+        _joulupukki.Position = paikka;
+        _joulupukki.Mass = 4.0;
+        _joulupukki.Image = _kuvaTaulukko[3];
+        
+        Add(_joulupukki);
     }
 
     
@@ -336,9 +465,11 @@ public class ohj1ht_peli : PhysicsGame
     private void LuoLaskuri()
     {
         _pelaajanPisteet = LuoPisteLaskuri(Screen.Right - 100.0, Screen.Top - 100.0);
+        
         _pelaajanPisteet.Value = 0;
         _pelaajanPisteet.MaxValue = 30;
         _pelaajanPisteet.MinValue = 0;
+        
         _pelaajanPisteet.AddTrigger(PisteRaja1, TriggerDirection.Up, RajaYlitetty);
         _pelaajanPisteet.AddTrigger(PisteRaja2, TriggerDirection.Up, RajaYlitetty);
         _pelaajanPisteet.AddTrigger(PisteRaja3, TriggerDirection.Up, RajaYlitetty);
