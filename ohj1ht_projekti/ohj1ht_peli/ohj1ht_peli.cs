@@ -22,27 +22,33 @@ public class ohj1ht_peli : PhysicsGame
     // Kenttä attribuutti.
     private int _kenntaNro = 1;
     private bool _aiheuttikoKuolema;
+    private bool _aiheuttikoVoitto;
     
     // Fysiikka-attribuutit.
     private const double Nopeus = 200;
     private const double HyppyNopeus = 750;
     private const int RuudunKoko = 40;
+    private const int VihollinenMitta = 20;
+    private const int JoulupukkiMitta = 50;
     
     // Kenttätaulukko.
     private static readonly string[] KenttaTaulukko ={"kentta1.txt","kentta2.txt","kentta3.txt"};
     
     // Kuvataulukko. 
     private Image[] _kuvaTaulukko = {LoadImage("ilkeä_ukko.png"),LoadImage("jere_default.png"),LoadImage("lahja.png"),LoadImage("joulupukki.png")};
+    private Image[] _nyrkkeilyTaulukko = {LoadImage("vasen_nyrkki.png"),LoadImage("oikea_nyrkki.png"),LoadImage("jere_ilkeä.png")};
     
     // Valikkotaulukko
     private string[] _alkuvaihtoehdot = { "Aloita peli", "Lopeta" };
     private string[] _toisetvaihtoehdot = { "Jatka peli", "Lopeta" };
+    private string[] _uudetvaihtoehdot = { "Uusi peli", "Lopeta" };
     
     // Olio-attribuutit
     private PlatformCharacter _pelaaja1;
     private PlatformCharacter _vihollinen;
     private PlatformCharacter _joulupukki;
-    private PhysicsObject _nyrkki;
+    private PhysicsObject _nyrkki1;
+    private PhysicsObject _nyrkki2;
 
     /// <summary>
     /// Syöttöpiste.
@@ -62,8 +68,8 @@ public class ohj1ht_peli : PhysicsGame
         int valikkoY = 0;
         Color valikkoVäri = Color.DarkGreen;
         
-        // Toteuttaa muulloin kuin pelaajan kuoleman seurauksena.
-        if (!_aiheuttikoKuolema)
+        // Toteuttaa muulloin kuin pelaajan kuoleman tai voiton seurauksena.
+        if (!_aiheuttikoKuolema && !_aiheuttikoVoitto)
         {
             ClearAll();
             Level.Background.CreateGradient(Color.LightBlue, Color.DarkBlue);   
@@ -76,7 +82,7 @@ public class ohj1ht_peli : PhysicsGame
             Add(otsikko);
         }
         
-        MultiSelectWindow alkuvalikko = new MultiSelectWindow("", vaihtoehdot);
+
         
         // Toteuttaa, jos aliohjelma kutsuttiin pelaajan kuoleman seurauksena.
         if (_aiheuttikoKuolema)
@@ -85,13 +91,22 @@ public class ohj1ht_peli : PhysicsGame
             valikkoVäri = Color.Red;
         }
         
-        alkuvalikko.X = 0;
-        alkuvalikko.Y = valikkoY;
-        alkuvalikko.Color = valikkoVäri;
-        alkuvalikko.CapturesMouse = false;
-        alkuvalikko.AddItemHandler(0, KenttaSeuraava);
-        alkuvalikko.AddItemHandler(1, Exit);
-        Add(alkuvalikko);
+        // Toteuttaa, jos aliohjelma kutsuttiin voiton seurauksena.
+        if (_aiheuttikoVoitto)
+        {
+            valikkoY = -125;
+            valikkoVäri = Color.Green;
+            vaihtoehdot = _uudetvaihtoehdot;
+        }
+        
+        MultiSelectWindow valikko = new MultiSelectWindow("", vaihtoehdot);
+        valikko.X = 0;
+        valikko.Y = valikkoY;
+        valikko.Color = valikkoVäri;
+        valikko.CapturesMouse = false;
+        valikko.AddItemHandler(0, KenttaSeuraava);
+        valikko.AddItemHandler(1, Exit);
+        Add(valikko);
         
     }
     
@@ -139,6 +154,30 @@ public class ohj1ht_peli : PhysicsGame
     
     
     /// <summary>
+    /// Kategoria: VALIKKO | Aliohjelma, joka käsittelee kuolematapausta. Luo erilaisen valikon
+    /// </summary>
+    private void OletVoittanut()
+    {
+        // Poistetaan kaikki ja asetetaan uusi taustaväri
+        ClearAll();
+        Level.Background.CreateGradient(Color.Green, Color.DarkGreen);  
+        
+        // Luodaan otsikko
+        Label otsikko = new Label("VOITTO!"); 
+        otsikko.Y = 50; 
+        otsikko.Font = new Font(100, true); 
+        otsikko.TextColor = Color.White;
+        Add(otsikko);
+        
+        _aiheuttikoVoitto = true;
+        
+        // Kutsutaan valikko ja resetoidaan kenttänumero.
+        _kenntaNro = 1;
+        Timer.CreateAndStart(0.5, ValikkoSeuraava);
+    }
+    
+    
+    /// <summary>
     /// Kategoria: PELIKENTTÄ | Aliohejlma, joka luo varsinaisen pelikentän.
     /// </summary>
     /// <param name="seuraavakentta"></param>
@@ -149,6 +188,7 @@ public class ohj1ht_peli : PhysicsGame
         
         // Asettaa muuttujan lepotilaan, jotta valikkojen ulkonäkö pysyisi järkevänä
         _aiheuttikoKuolema = false;
+        _aiheuttikoVoitto = false;
             
         // Pelikentän omaisuudet.
         TileMap kentta = TileMap.FromLevelAsset(seuraavakentta);
@@ -279,17 +319,43 @@ public class ohj1ht_peli : PhysicsGame
     /// <param name="nopeus"></param>
     private void LisaaNyrkki(PlatformCharacter hahmo, double nopeus)
     {
-        _nyrkki = new PlatformCharacter(60, 60);
-        _nyrkki.X = hahmo.X + 20;
-        _nyrkki.Y = hahmo.Y;
-        _nyrkki.Image = _kuvaTaulukko[1];
-        _nyrkki.Tag = "nyrkki";
-        _nyrkki.LifetimeLeft = TimeSpan.FromSeconds( 0.05 );
-        Add(_nyrkki);
+        // Oikea nyrkki.
+        _nyrkki1 = new PlatformCharacter(60, 60);
+        _nyrkki1.X = hahmo.X - 20;
+        _nyrkki1.Y = hahmo.Y;
+        _nyrkki1.Image = _nyrkkeilyTaulukko[1];
+        _nyrkki1.Tag = "nyrkki";
+        _nyrkki1.LifetimeLeft = TimeSpan.FromSeconds( 0.05 );
+        
+        // Vasen nyrkki.
+        _nyrkki2 = new PlatformCharacter(60, 60);
+        _nyrkki2.X = hahmo.X + 20;
+        _nyrkki2.Y = hahmo.Y;
+        _nyrkki2.Image = _nyrkkeilyTaulukko[0];
+        _nyrkki2.Tag = "nyrkki";
+        _nyrkki2.LifetimeLeft = TimeSpan.FromSeconds( 0.05 );
+        
+        // Pelaajahahmon ilme muuttuu
+        _pelaaja1.Image = _nyrkkeilyTaulukko[2];
+        
+        Add(_nyrkki1);
+        Add(_nyrkki2);
+        
+        Timer.CreateAndStart(1, JerenIlme);
     }
     
+    
     /// <summary>
-    /// Kategoria: OHJAIMET | Aliohjelma, joak käsittelee nyrkkitörmäystapausta.
+    /// Kategoria: OHJAIMET | Aliohjelma, joka muuttaa pelaajahahmon ilmeen.
+    /// </summary>
+    private void JerenIlme()
+    {
+         _pelaaja1.Image = _kuvaTaulukko[1]; 
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: OHJAIMET | Aliohjelma, joka käsittelee nyrkkitörmäystapausta.
     /// Mitä tapahtuu: kasvattaa pistemäärän, räjähdys, vihollinen kuolee.
     /// </summary>
     /// <param name="vihollinen"></param>
@@ -301,6 +367,25 @@ public class ohj1ht_peli : PhysicsGame
         _pelaajanPisteet.Value += 1;
         Add(rajahdys);
         vihollinen.Destroy();
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: OHJAIMET | Aliohjelma, joak käsittelee nyrkkitörmäystapausta joulupukin suhteen.
+    /// Mitä tapahtuu: voittotapahtuma ja ilmestyy voittovalikko.
+    /// </summary>
+    /// <param name="joulupukki"></param>
+    /// <param name="nyrkki"></param>
+    private void NyrkkiTörmäysJoulupukkiin(PhysicsObject joulupukki, PhysicsObject nyrkki)
+    {
+        Explosion rajahdys = new Explosion(50);
+        rajahdys.Position = joulupukki.Position;
+        _pelaajanPisteet.Value += 1;
+        Add(rajahdys);
+        joulupukki.Destroy();
+        
+        //Voitto
+        Timer.CreateAndStart(0.3, OletVoittanut);
     }
     
     
@@ -317,6 +402,7 @@ public class ohj1ht_peli : PhysicsGame
         _pelaaja1.Position = paikka;
         _pelaaja1.Mass = 4.0;
         _pelaaja1.Image = _kuvaTaulukko[1];
+        
         
         // Törmäysehdot: vihollinen & lahja
         AddCollisionHandler(_pelaaja1, "Lahja", LahjaTörmäys);
@@ -354,7 +440,7 @@ public class ohj1ht_peli : PhysicsGame
     /// <param name="korkeus"></param>
     private void LisaaVihollinen(Vector paikka, double leveys, double korkeus)
     {
-        _vihollinen = new PlatformCharacter(leveys, korkeus);
+        _vihollinen = new PlatformCharacter(leveys + VihollinenMitta, korkeus + VihollinenMitta);
         _vihollinen.Position = paikka;
         _vihollinen.Mass = 4.0;
         _vihollinen.Image = _kuvaTaulukko[0];
@@ -374,11 +460,13 @@ public class ohj1ht_peli : PhysicsGame
     /// <param name="korkeus"></param>
     private void LisaaJoulupukki(Vector paikka, double leveys, double korkeus)
     {
-        _joulupukki = new PlatformCharacter(leveys, korkeus);
+        _joulupukki = new PlatformCharacter(leveys + JoulupukkiMitta, korkeus + JoulupukkiMitta);
         _joulupukki.Position = paikka;
         _joulupukki.Mass = 4.0;
         _joulupukki.Image = _kuvaTaulukko[3];
+        _joulupukki.Tag = "vihollinen";
         
+        AddCollisionHandler(_joulupukki, "nyrkki", NyrkkiTörmäysJoulupukkiin);
         Add(_joulupukki);
     }
 
