@@ -1,8 +1,4 @@
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\ohj1ht_peli.exe
-C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\Content\kentta1.txt
-C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\Content\maali.wav
-C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\Content\norsu.png
-C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\Content\tahti.png
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\ohj1ht_peli.deps.json
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\ohj1ht_peli.runtimeconfig.json
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\ohj1ht_peli.dll
@@ -55,3 +51,4 @@ C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debu
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debug\net8.0\ohj1ht_peli.genruntimeconfig.cache
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debug\net8.0\ref\ohj1ht_peli.dll
 C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\obj\Debug\net8.0\ohj1ht_peli.sourcelink.json
+C:\Users\J\RiderProjects\ohj1ht_repositorio\ohj1ht_projekti\ohj1ht_peli\bin\Debug\net8.0\Content\kentta1.txt

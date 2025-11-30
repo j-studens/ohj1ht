@@ -35,7 +35,7 @@ public class ohj1ht_peli : PhysicsGame
     private static readonly string[] KenttaTaulukko ={"kentta1.txt","kentta2.txt","kentta3.txt"};
     
     // Kuvataulukko. 
-    private Image[] _kuvaTaulukko = {LoadImage("ilkeä_ukko.png"),LoadImage("jere_default.png"),LoadImage("lahja.png"),LoadImage("joulupukki.png")};
+    private Image[] _kuvaTaulukko = {LoadImage("ilkeä_ukko.png"),LoadImage("jere_default.png"),LoadImage("lahja.png"),LoadImage("joulupukki.png"),LoadImage("lumihiutale.png")};
     private Image[] _nyrkkeilyTaulukko = {LoadImage("vasen_nyrkki.png"),LoadImage("oikea_nyrkki.png"),LoadImage("jere_ilkeä.png")};
     
     // Valikkotaulukko
@@ -49,6 +49,8 @@ public class ohj1ht_peli : PhysicsGame
     private PlatformCharacter _joulupukki;
     private PhysicsObject _nyrkki1;
     private PhysicsObject _nyrkki2;
+    private PhysicsObject _lumihiutale;
+    Random _satunnainen = new Random();
 
     /// <summary>
     /// Syöttöpiste.
@@ -82,7 +84,6 @@ public class ohj1ht_peli : PhysicsGame
             Add(otsikko);
         }
         
-
         
         // Toteuttaa, jos aliohjelma kutsuttiin pelaajan kuoleman seurauksena.
         if (_aiheuttikoKuolema)
@@ -219,6 +220,7 @@ public class ohj1ht_peli : PhysicsGame
         PhysicsObject taso = PhysicsObject.CreateStaticObject(leveys, korkeus);
         taso.Position = paikka;
         taso.Color = Color.White;
+        taso.Tag = "taso";
         Add(taso);
     }
     
@@ -266,7 +268,6 @@ public class ohj1ht_peli : PhysicsGame
                 LuoKentta(KenttaTaulukko[2]);
                 break;
             case 4:
-                Exit();
                 break;
         }
     }
@@ -469,7 +470,66 @@ public class ohj1ht_peli : PhysicsGame
         AddCollisionHandler(_joulupukki, "nyrkki", NyrkkiTörmäysJoulupukkiin);
         Add(_joulupukki);
     }
-
+    
+    
+    /// <summary>
+    /// Kategoria: PISTEET | Aliohjelma, joka lisää pistelaskurin.
+    /// </summary>
+    private void SaaEnnuste()
+    {
+        Label otsikko = new Label("LUMISADE!!!!!!"); 
+        
+        otsikko.Y = 50; 
+        otsikko.Font = new Font(100, true); 
+        otsikko.TextColor = Color.Red;
+        Add(otsikko);
+        
+        Timer.CreateAndStart(2, otsikko.Destroy);
+        Timer.CreateAndStart(2, LuoLumisade);
+    }
+    
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    private void LuoLumisade()
+    {
+        for (int j = 0; j < _satunnainen.Next(32, 64); j++)
+        {
+            LuoLumiHiutale();
+        }    
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: VIHOLLINEN | Aliohjelma, joka luo lumihiutaleen.
+    /// Samalla asettaa viholliselle törmäysehdon.
+    /// </summary>
+    private void LuoLumiHiutale()
+    {
+        
+        _lumihiutale = new PhysicsObject(RuudunKoko, RuudunKoko);
+        
+        _lumihiutale.X = _pelaaja1.X + _satunnainen.Next(-300, 301);
+        _lumihiutale.Y = _pelaaja1.Y + _satunnainen.Next(300, 401);
+        _lumihiutale.Mass = 4.0;
+        _lumihiutale.Image = _kuvaTaulukko[4];
+        _lumihiutale.Tag = "vihollinen";
+        _lumihiutale.LifetimeLeft = TimeSpan.FromSeconds(0.8);
+        
+        AddCollisionHandler(_lumihiutale, "taso", LumiHiutaleTormays);
+        Add(_lumihiutale);
+    }
+    
+    
+    /// <summary>
+    /// Kategoria: VIHOLLINEN | Aliohjelma, joka vastaa lumihiutaleen törmäystapausta seuraavat tapahtumat.
+    /// </summary>
+    private void LumiHiutaleTormays(PhysicsObject lumihiutale, PhysicsObject taso)
+    {
+        lumihiutale.Destroy();
+    }
+    
     
     /// <summary>
     /// Kategoria: LAHJAT | Aliohjelma, joka luo lahjat kenttään.
@@ -512,33 +572,27 @@ public class ohj1ht_peli : PhysicsGame
         switch (_pelaajanPisteet.Value)
         {
             case PisteRaja1:
-                
                 MessageDisplay.Add("Killing spree!");
                 break;
             
             case PisteRaja2:
-                
                 MessageDisplay.Add("Rampage!");
                 break;
             
             case PisteRaja3:
-                
                 MessageDisplay.Add("Dominating!");
                 break;
             
             case PisteRaja4:
-                
                 MessageDisplay.Add("Unstoppable!");
                 break;
             
             case PisteRaja5:
-                
                 MessageDisplay.Add("Godlike!");
                 break;
             
             // Lähettää viestin, kasvattaa muuttujan yhdellä ja kutsuu aliohjelma, joka vaihtaa kenttää.
             case PisteRaja6:
-                
                 MessageDisplay.Add("Wicked Sick!!");
                 _kenntaNro++;
                 SeuraavaKentta();
@@ -564,6 +618,12 @@ public class ohj1ht_peli : PhysicsGame
         _pelaajanPisteet.AddTrigger(PisteRaja4, TriggerDirection.Up, RajaYlitetty);
         _pelaajanPisteet.AddTrigger(PisteRaja5, TriggerDirection.Up, RajaYlitetty);
         _pelaajanPisteet.AddTrigger(PisteRaja6, TriggerDirection.Up, RajaYlitetty);
+        
+        // Viimeinen pelikenttä
+        if (_kenntaNro == 3)
+        {
+            _pelaajanPisteet.AddTrigger(PisteRaja1, TriggerDirection.Up, SaaEnnuste);
+        }
     }
     
     
