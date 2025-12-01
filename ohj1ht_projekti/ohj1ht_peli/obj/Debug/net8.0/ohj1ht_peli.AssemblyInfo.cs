@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ohj1ht_peli")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c4d57b51c11da558003fe3a975431883c4ba463")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3dadd8c827bf39f2edf3aab022fa26d35c2a489c")]
 [assembly: System.Reflection.AssemblyProductAttribute("ohj1ht_peli")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ohj1ht_peli")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
