@@ -2,12 +2,17 @@ using System;
 using Jypeli;
 using Jypeli.Assets;
 
-/// @author J
-/// @version 19.11.2025
+/// @author Seppänen Joonas
+/// @version 1.12.2025
 /// <summary>
-/// 
+/// LUMIUKKO FIGHTER on tasohyppelypeli, jossa pelaaja torjuu joulupukin sotajoukkoja ja pyrkii kukistamaan itse joulupukin.
+/// TAVOITE: kerää mahdollisimman paljon pisteitä ja kukista joulupukki.
+/// Pelissä kerätään lahjoja ja nyrkkeilään vihollisia vastaan, mikä kasvattaa pistemäärää.
+/// Liikkuminen tapahtuu nuolinäppäinten ja nyrkkeily välilyönnin avulla. 
+/// Pelissä on useita pelikenttiä ja haasteita, kuten lumisade.
+/// Kaiken lisäksi pelissä on toimiva graafinen käyttöliittymä.
 /// </summary>
-public class ohj1ht_peli : PhysicsGame
+public class Ohj1htPeli : PhysicsGame
 {
     
     // Piste-attribuutit.    
@@ -21,7 +26,7 @@ public class ohj1ht_peli : PhysicsGame
     private int[] _kokonaisPisteet = { 0, 0, 0 };
     
     // Kenttä attribuutti.
-    private int _kenntaNro = 1;
+    private int _kenttaNro = 1;
     private int _viimeinenKentta = 3;
     private int _toinenKentta = 2;
     private bool _aiheuttikoKuolema;
@@ -37,12 +42,12 @@ public class ohj1ht_peli : PhysicsGame
     // Kenttätaulukko.
     private static readonly string[] KenttaTaulukko ={"kentta1.txt","kentta2.txt","kentta3.txt"};
     
-    // Kuvataulukko. 
+    // Kuvataulukot. 
     private Image[] _kuvaTaulukko = {LoadImage("ilkeä_ukko.png"),LoadImage("jere_default.png"),LoadImage("lahja.png"),LoadImage("joulupukki.png")};
     private Image[] _nyrkkeilyTaulukko = {LoadImage("vasen_nyrkki.png"),LoadImage("oikea_nyrkki.png"),LoadImage("jere_ilkeä.png")};
     private Image[] _lumiHiutaleTaulukko = {LoadImage("lumihiutale.png"),LoadImage("lumihiutale2.png"),LoadImage("lumihiutale3.png"),LoadImage("lumihiutale4.png"),LoadImage("lumihiutale5.png")};
     
-    // Valikkotaulukko
+    // Valikkotaulukot
     private string[] _alkuvaihtoehdot = { "Aloita peli", "Lopeta" };
     private string[] _toisetvaihtoehdot = { "Jatka peli", "Lopeta" };
     private string[] _uudetvaihtoehdot = { "Uusi peli", "Lopeta" };
@@ -71,7 +76,7 @@ public class ohj1ht_peli : PhysicsGame
     {
         
         int valikkoY = 0;
-        Color valikkoVäri = Color.DarkGreen;
+        Color valikkoVari = Color.DarkGreen;
         
         // Toteuttaa muulloin kuin pelaajan kuoleman tai voiton seurauksena.
         if (!_aiheuttikoKuolema && !_aiheuttikoVoitto)
@@ -90,19 +95,19 @@ public class ohj1ht_peli : PhysicsGame
         if (_aiheuttikoKuolema)
         {
             valikkoY = -125;
-            valikkoVäri = Color.Red;
+            valikkoVari = Color.Red;
         }
         
         // Toteuttaa, jos aliohjelma kutsuttiin voiton seurauksena.
         if (_aiheuttikoVoitto)
         {
             valikkoY = -125;
-            valikkoVäri = Color.Green;
+            valikkoVari = Color.Green;
             vaihtoehdot = _uudetvaihtoehdot;
         }
         
         // Luodaan näppäimet valikolle.
-        MultiSelectWindow valikko = LuoValikko(vaihtoehdot, valikkoY, valikkoVäri);
+        MultiSelectWindow valikko = LuoValikko(vaihtoehdot, valikkoY, valikkoVari);
         Add(valikko);
         
     }
@@ -111,13 +116,13 @@ public class ohj1ht_peli : PhysicsGame
     /// <summary>
     /// Kategoria: VALIKKO | Aliohjelma, joka palauttaa valikon näppäimet.
     /// </summary>
-    private MultiSelectWindow LuoValikko(string [] vaihtoehdot, int valikkoY, Color valikkoVäri)
+    private MultiSelectWindow LuoValikko(string [] vaihtoehdot, int valikkoY, Color valikkoVari)
     {
         
         MultiSelectWindow valikko = new MultiSelectWindow("", vaihtoehdot);
         valikko.X = 0;
         valikko.Y = valikkoY;
-        valikko.Color = valikkoVäri;
+        valikko.Color = valikkoVari;
         valikko.CapturesMouse = false;
         valikko.AddItemHandler(0, KenttaSeuraava);
         valikko.AddItemHandler(1, Exit);
@@ -188,7 +193,7 @@ public class ohj1ht_peli : PhysicsGame
         TallennaPisteet();
         LaskeKaikkiPisteet();
         
-        _kenntaNro = 1;
+        _kenttaNro = 1;
         
         Timer.CreateAndStart(0.5, ValikkoSeuraava);
     }
@@ -275,7 +280,7 @@ public class ohj1ht_peli : PhysicsGame
         ClearAll();
         
         // Valitsee kenttätiedoston taulukosta.
-        switch (_kenntaNro)
+        switch (_kenttaNro)
         {
             case 1:
                 LuoKentta(KenttaTaulukko[0]);
@@ -393,7 +398,7 @@ public class ohj1ht_peli : PhysicsGame
     /// </summary>
     /// <param name="vihollinen"></param>
     /// <param name="nyrkki"></param>
-    private void NyrkkiTörmäys(PhysicsObject vihollinen, PhysicsObject nyrkki)
+    private void NyrkkiTormays(PhysicsObject vihollinen, PhysicsObject nyrkki)
     {
         _pelaajanPisteet.Value += 1;
         
@@ -411,7 +416,7 @@ public class ohj1ht_peli : PhysicsGame
     /// </summary>
     /// <param name="joulupukki"></param>
     /// <param name="nyrkki"></param>
-    private void NyrkkiTörmäysJoulupukkiin(PhysicsObject joulupukki, PhysicsObject nyrkki)
+    private void NyrkkiTormaysJoulupukkiin(PhysicsObject joulupukki, PhysicsObject nyrkki)
     {
         _pelaajanPisteet.Value += 1;
         
@@ -440,8 +445,8 @@ public class ohj1ht_peli : PhysicsGame
         _pelaaja1.Image = _kuvaTaulukko[1];
         
         // Törmäysehdot: vihollinen & lahja
-        AddCollisionHandler(_pelaaja1, "Lahja", LahjaTörmäys);
-        AddCollisionHandler(_pelaaja1, "vihollinen", VihollinenTörmäys);
+        AddCollisionHandler(_pelaaja1, "Lahja", LahjaTormays);
+        AddCollisionHandler(_pelaaja1, "vihollinen", VihollinenTormays);
         
         Add(_pelaaja1);
     }
@@ -453,7 +458,7 @@ public class ohj1ht_peli : PhysicsGame
     /// </summary>
     /// <param name="pelaaja"></param>
     /// <param name="vihollinen"></param>
-    private void VihollinenTörmäys(PhysicsObject pelaaja, PhysicsObject vihollinen)
+    private void VihollinenTormays(PhysicsObject pelaaja, PhysicsObject vihollinen)
     {
         
         // Räjähdysolion kutsu.
@@ -483,7 +488,7 @@ public class ohj1ht_peli : PhysicsGame
         _vihollinen.Tag = "vihollinen";
         
         // Asettaa törmöysehdon.
-        AddCollisionHandler(_vihollinen, "nyrkki", NyrkkiTörmäys);
+        AddCollisionHandler(_vihollinen, "nyrkki", NyrkkiTormays);
         
         Add(_vihollinen);
     }
@@ -506,7 +511,7 @@ public class ohj1ht_peli : PhysicsGame
         _joulupukki.Tag = "vihollinen";
         
         // Asettaa törmöysehdon.
-        AddCollisionHandler(_joulupukki, "nyrkki", NyrkkiTörmäysJoulupukkiin);
+        AddCollisionHandler(_joulupukki, "nyrkki", NyrkkiTormaysJoulupukkiin);
         
         Add(_joulupukki);
     }
@@ -593,7 +598,7 @@ public class ohj1ht_peli : PhysicsGame
     /// </summary>
     /// <param name="hahmo"></param>
     /// <param name="tahti"></param>
-    private void LahjaTörmäys(PhysicsObject hahmo, PhysicsObject tahti)
+    private void LahjaTormays(PhysicsObject hahmo, PhysicsObject tahti)
     {
         MessageDisplay.Add("Sait Lahjan!");
         _pelaajanPisteet.Value += 1;
@@ -639,7 +644,7 @@ public class ohj1ht_peli : PhysicsGame
                 MessageDisplay.Add("Wicked Sick!!");
                 TallennaPisteet();
                 
-                _kenntaNro++;
+                _kenttaNro++;
                 SeuraavaKentta();
                 break;
         }
@@ -665,7 +670,7 @@ public class ohj1ht_peli : PhysicsGame
         _pelaajanPisteet.AddTrigger(PisteRaja6, TriggerDirection.Up, RajaYlitetty);
         
         // Aktivoi lumisateen toiselle ja viimeiselle pelikentällä, mikä nostattaa vaikeustason.
-        if (_kenntaNro == _viimeinenKentta || _kenntaNro == _toinenKentta)
+        if (_kenttaNro == _viimeinenKentta || _kenttaNro == _toinenKentta)
         {
             _pelaajanPisteet.AddTrigger(PisteRaja1, TriggerDirection.Up, SaaEnnuste);
         }
@@ -724,7 +729,7 @@ public class ohj1ht_peli : PhysicsGame
     /// </summary>
     private void TallennaPisteet()
     {
-        _kokonaisPisteet[_kenntaNro - 1] = _pelaajanPisteet.Value;
+        _kokonaisPisteet[_kenttaNro - 1] = _pelaajanPisteet.Value;
     }
     
     
@@ -733,18 +738,18 @@ public class ohj1ht_peli : PhysicsGame
     /// </summary>
     private void KumoaPisteet()
     {
-        _kokonaisPisteet[_kenntaNro - 1] = 0;
+        _kokonaisPisteet[_kenttaNro - 1] = 0;
     }
 
     /// <summary>
     /// Kategoria: ELEMENTTI | Aliohjelma, joka palauttaa otsikko-elementin johonkin tiettyyn tarpeeseen. Esim. valikkolle.
     /// </summary>
-    private Label LuoOtsikko(string otsikkoTeksti, string otsikkoPisteet, int otsikkoY, Color otsikkoVari, int otsikKokoko, bool otsikkoKorostus)
+    private Label LuoOtsikko(string otsikkoTeksti, string otsikkoPisteet, int otsikkoY, Color otsikkoVari, int otsikkoKoko, bool otsikkoKorostus)
     {
         Label otsikko = new Label(otsikkoTeksti + otsikkoPisteet);    
         otsikko.Y = otsikkoY; 
         otsikko.TextColor = otsikkoVari;
-        otsikko.Font = new Font(otsikKokoko, otsikkoKorostus); 
+        otsikko.Font = new Font(otsikkoKoko, otsikkoKorostus); 
         
         return otsikko;
     }

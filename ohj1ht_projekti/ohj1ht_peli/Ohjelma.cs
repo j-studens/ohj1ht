@@ -1,8 +1,6 @@
 ﻿#region Using Statements
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 #endregion
 
@@ -17,7 +15,7 @@ public static class Program
     [STAThread]
     static void Main()
     {
-        using var game = new ohj1ht_peli();
+        using var game = new Ohj1htPeli();
         game.Run();
     }
 }
