@@ -72,6 +72,7 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: VALIKKO | Aliohjelma, joka luo alkuvalikon.
     /// </summary>
+    /// <param name="vaihtoehdot"> Valikkonäppäinten vaihtoehdot valikkoon </param>
     private void LisaaValikko(string[] vaihtoehdot)
     {
         
@@ -116,6 +117,10 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: VALIKKO | Aliohjelma, joka palauttaa valikon näppäimet.
     /// </summary>
+    /// <param name="vaihtoehdot"> Valikkonäppäinten vaihtoehdot valikkoon. </param>
+    /// <param name="valikkoY"> Näppäinvalikon sijainti Y-akselilla. </param>
+    /// <param name="valikkoVari"> Näppäinvalikon väri. </param>
+    /// <returns></returns>
     private MultiSelectWindow LuoValikko(string [] vaihtoehdot, int valikkoY, Color valikkoVari)
     {
         
@@ -202,7 +207,7 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: PELIKENTTÄ | Aliohejlma, joka luo varsinaisen pelikentän.
     /// </summary>
-    /// <param name="seuraavakentta"></param>
+    /// <param name=  "seuraavakentta"> Jonkin tietyn kentän .txt-tiedosto. </param> 
     private void LuoKentta(string seuraavakentta)
     {
         // Painovoima & fysiikka
@@ -233,9 +238,9 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: PELIKENTTÄ | Ohjelma, joka luo tason. Kutsuttava.
     /// </summary>
-    /// <param name="paikka"></param>
-    /// <param name="leveys"></param>
-    /// <param name="korkeus"></param>
+    /// <param name="paikka"> Sijaintikoordinaatti kentällä. </param>
+    /// <param name="leveys"> Olion Leveysmitta. </param>
+    /// <param name="korkeus"> Olion korkeusmitta. </param>
     private void LisaaTaso(Vector paikka, double leveys, double korkeus)
     {
         PhysicsObject taso = PhysicsObject.CreateStaticObject(leveys, korkeus);
@@ -318,8 +323,8 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: OHJAIMET | Aliohjelma, joka käsittelee liikkumisen toiminnallisuutta. Kutsuttava.
     /// </summary>
-    /// <param name="hahmo"></param>
-    /// <param name="nopeus"></param>
+    /// <param name="hahmo"> Olio, johon toiminnallisuus kohdistuu </param>
+    /// <param name="nopeus"> Vaikuttavan voiman ominaisuus </param>
     private void Liikuta(PlatformCharacter hahmo, double nopeus)
     {
         hahmo.Walk(nopeus);
@@ -329,8 +334,8 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: OHJAIMET | Aliohjelma, joka käsittelee hyppyjen toiminnallisuutta. Kutsuttava.
     /// </summary>
-    /// <param name="hahmo"></param>
-    /// <param name="nopeus"></param>
+    /// <param name="hahmo"> Olio, johon toiminnallisuus kohdistuu </param>
+    /// <param name="nopeus"> Vaikuttavan voiman ominaisuus </param>
     private void Hyppaa(PlatformCharacter hahmo, double nopeus)
     {
         hahmo.Jump(nopeus);
@@ -340,8 +345,8 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: OHJAIMET | Aliohjelma, joka lisää nyrkkiolion, jolla on lyhyt elinikä. Kutsuttava.
     /// </summary>
-    /// <param name="hahmo"></param>
-    /// <param name="nopeus"></param>
+    /// <param name="hahmo"> Olio, johon toiminnallisuus kohdistuu </param>
+    /// <param name="nopeus"> Vaikuttavan voiman ominaisuus </param>
     private void LisaaNyrkki(PlatformCharacter hahmo, double nopeus)
     {
 
@@ -365,9 +370,9 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: OHJAIMET | Alihojelma, joka palauttaa nyrkkiolion. 
     /// </summary>
-    /// <param name="hahmo"></param>
-    /// <param name="offSet"></param>
-    /// <param name="taulukkoIndeksi"></param>
+    /// <param name="hahmo"> Olio, jolle luodaan nyrkkioliot. </param>
+    /// <param name="offSet"> Nyrkkiolion sijainnin poikkeama. </param>
+    /// <param name="taulukkoIndeksi"> Nyrkkiolion grafiikat. </param>
     /// <returns></returns>
     private PlatformCharacter LuoNyrkki(PlatformCharacter hahmo, int offSet, int taulukkoIndeksi)
     {
@@ -396,8 +401,8 @@ public class Ohj1htPeli : PhysicsGame
     /// Kategoria: OHJAIMET | Aliohjelma, joka käsittelee nyrkkitörmäystapausta.
     /// Mitä tapahtuu: kasvattaa pistemäärän, räjähdys ilmenee, vihollinen kuolee.
     /// </summary>
-    /// <param name="vihollinen"></param>
-    /// <param name="nyrkki"></param>
+    /// <param name="vihollinen"> Olio, jota tuhotaan. </param>
+    /// <param name="nyrkki"> Olio, jonka seurauksena tuhottava olio tuhotaan.</param>
     private void NyrkkiTormays(PhysicsObject vihollinen, PhysicsObject nyrkki)
     {
         _pelaajanPisteet.Value += 1;
@@ -414,8 +419,8 @@ public class Ohj1htPeli : PhysicsGame
     /// Kategoria: OHJAIMET | Aliohjelma, joka käsittelee nyrkkitörmäystapausta joulupukin suhteen.
     /// Mitä tapahtuu: voittotapahtuma ja voittovalikko ilmestyy.
     /// </summary>
-    /// <param name="joulupukki"></param>
-    /// <param name="nyrkki"></param>
+    /// <param name="joulupukki"> Olio, jota tuhotaan. </param>
+    /// <param name="nyrkki"> Olio, jonka seurauksena tuhottava olio tuhotaan. </param>
     private void NyrkkiTormaysJoulupukkiin(PhysicsObject joulupukki, PhysicsObject nyrkki)
     {
         _pelaajanPisteet.Value += 1;
@@ -434,9 +439,9 @@ public class Ohj1htPeli : PhysicsGame
     /// Kategoria: PELAAJA | Aliohjelma, joka luo pelaajahahmon.
     /// Samalla luo törmäysehdot
     /// </summary>
-    /// <param name="paikka"></param>
-    /// <param name="leveys"></param>
-    /// <param name="korkeus"></param>
+    /// <param name="paikka"> Pelaajahahmon määritetty sijainti kentällä </param>
+    /// <param name="leveys"> Pelaajahahmon leveysmitta </param>
+    /// <param name="korkeus"> Pelaajahahmon korkeusmitta </param>
     private void LisaaPelaaja(Vector paikka, double leveys, double korkeus)
     {
         _pelaaja1 = new PlatformCharacter(leveys, korkeus);
@@ -456,8 +461,8 @@ public class Ohj1htPeli : PhysicsGame
     /// Kategoria: VIHOLLINEN | Aliohjelma, joka vastaa vihollisen törmäystapausta seuraavat tapahtumat.
     /// Mitä tapahtuu: räjähdys, pelaajahahmo kuolee, valikko ilmestyy.
     /// </summary>
-    /// <param name="pelaaja"></param>
-    /// <param name="vihollinen"></param>
+    /// <param name="pelaaja"> Olio, jota tuhotaan. </param>
+    /// <param name="vihollinen"> Olio, jonka seurauksena tuhottava olio tuhotaan. </param>
     private void VihollinenTormays(PhysicsObject pelaaja, PhysicsObject vihollinen)
     {
         
@@ -475,9 +480,9 @@ public class Ohj1htPeli : PhysicsGame
     /// Kategoria: VIHOLLINEN | Aliohjelma, joka luo vihollisen kenttään.
     /// Samalla asettaa viholliselle törmäysehdon.
     /// </summary>
-    /// <param name="paikka"></param>
-    /// <param name="leveys"></param>
-    /// <param name="korkeus"></param>
+    /// <param name="paikka"> Vihollisolion määritetty sijainti kentällä </param>
+    /// <param name="leveys"> Vihollisolion leveysmitta </param>
+    /// <param name="korkeus"> Vihollisolion korkeusmitta </param>
     private void LisaaVihollinen(Vector paikka, double leveys, double korkeus)
     {
         _vihollinen = new PlatformCharacter(leveys + VihollinenMitta, korkeus + VihollinenMitta);
@@ -498,9 +503,9 @@ public class Ohj1htPeli : PhysicsGame
     /// Kategoria: VIHOLLINEN | Aliohjelma, joka luo joulupukin kenttään.
     /// Samalla asettaa viholliselle törmäysehdon.
     /// </summary>
-    /// <param name="paikka"></param>
-    /// <param name="leveys"></param>
-    /// <param name="korkeus"></param>
+    /// <param name="paikka"> Joulupukin määritetty sijainti kentällä </param>
+    /// <param name="leveys"> Joulupukin leveysmitta </param>
+    /// <param name="korkeus"> Joulupukin korkeusmitta </param>
     private void LisaaJoulupukki(Vector paikka, double leveys, double korkeus)
     {
         _joulupukki = new PlatformCharacter(leveys + JoulupukkiMitta, korkeus + JoulupukkiMitta);
@@ -567,6 +572,8 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: VIHOLLINEN | Aliohjelma, joka vastaa lumihiutaleen törmäystapausta seuraavat tapahtumat.
     /// </summary>
+    /// <param name="lumihiutale"> Olio, jota tuhotaan. </param>
+    /// <param name="taso"> Olio, jonka seurauksena tuhottava olio tuhotaan. </param>
     private void LumiHiutaleTormays(PhysicsObject lumihiutale, PhysicsObject taso)
     {
         // Lumihiutale tuhoutuu törmätessä tasoon.
@@ -577,9 +584,9 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: LAHJAT | Aliohjelma, joka luo lahjat kenttään.
     /// </summary>
-    /// <param name="paikka"></param>
-    /// <param name="leveys"></param>
-    /// <param name="korkeus"></param>
+    /// <param name="paikka"> Lahjaolion määritetty sijainti kentällä. </param>
+    /// <param name="leveys"> Lahjaolion leveysmitta. </param>
+    /// <param name="korkeus"> Lahjaolion korkeusmitta. </param>
     private void LisaaLahja(Vector paikka, double leveys, double korkeus)
     {
         PhysicsObject lahja = PhysicsObject.CreateStaticObject(leveys, korkeus);
@@ -596,13 +603,13 @@ public class Ohj1htPeli : PhysicsGame
     /// Kategoria: LAHJAT | Aliohjelma, joka vastaa lahjan törmäystapausta seuraavat tapahtumat.
     /// Mitä tapahtuu: kasvattaa pistemäärän, lahja tuhoutuu. 
     /// </summary>
-    /// <param name="hahmo"></param>
-    /// <param name="tahti"></param>
-    private void LahjaTormays(PhysicsObject hahmo, PhysicsObject tahti)
+    /// <param name="hahmo"> Olio, jonka seurauksena tuhottava olio tuhotaan. </param>
+    /// <param name="lahja"> Olio, jota tuhotaan. </param>
+    private void LahjaTormays(PhysicsObject hahmo, PhysicsObject lahja)
     {
         MessageDisplay.Add("Sait Lahjan!");
         _pelaajanPisteet.Value += 1;
-        tahti.Destroy();
+        lahja.Destroy();
     }
     
     
@@ -680,6 +687,9 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: PISTEET | Aliohjelma, joka luo pistelaskurin.
     /// </summary>
+    /// <param name="x"> Pistelaskurin sijainti x-akselilla </param>
+    /// <param name="y"> Pistelaskurin sijainti y-akselilla </param>
+    /// <returns></returns>
     private IntMeter LuoPisteLaskuri(double x, double y)
     {
         
@@ -744,6 +754,13 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     /// Kategoria: ELEMENTTI | Aliohjelma, joka palauttaa otsikko-elementin johonkin tiettyyn tarpeeseen. Esim. valikkolle.
     /// </summary>
+    /// <param name="otsikkoTeksti"> Otsikko-olion varsinainen teksi. </param>
+    /// <param name="otsikkoPisteet"> Otsikko-olion osoittama pistemäärä. </param>
+    /// <param name="otsikkoY"> Otsikko-olion sijainti y-akselilla. </param>
+    /// <param name="otsikkoVari"> Otsikko-olion tekstin väri. </param>
+    /// <param name="otsikkoKoko"> Otsikko-olion mitta eli koko. </param>
+    /// <param name="otsikkoKorostus"> Otsikko-olion tekstin ominaisuus. </param>
+    /// <returns></returns>
     private Label LuoOtsikko(string otsikkoTeksti, string otsikkoPisteet, int otsikkoY, Color otsikkoVari, int otsikkoKoko, bool otsikkoKorostus)
     {
         Label otsikko = new Label(otsikkoTeksti + otsikkoPisteet);    
@@ -758,7 +775,7 @@ public class Ohj1htPeli : PhysicsGame
     /// <summary>
     ///  Kategoria: ELEMENTTI | Aliohjelma, joka palauttaa räjähdysolion.
     /// </summary>
-    /// <param name="olio"></param>
+    /// <param name="olio"> Olio, jonka sijainti otetaan räjähdysefektin sijainniksi. </param>
     /// <returns></returns>
     private Explosion LuoRajahdys(PhysicsObject olio)
     {
