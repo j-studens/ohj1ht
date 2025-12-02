@@ -120,7 +120,7 @@ public class Ohj1htPeli : PhysicsGame
     /// <param name="vaihtoehdot"> Valikkonäppäinten vaihtoehdot valikkoon. </param>
     /// <param name="valikkoY"> Näppäinvalikon sijainti Y-akselilla. </param>
     /// <param name="valikkoVari"> Näppäinvalikon väri. </param>
-    /// <returns></returns>
+    /// <returns> Palauttaa näppäinvalikon. </returns>
     private MultiSelectWindow LuoValikko(string [] vaihtoehdot, int valikkoY, Color valikkoVari)
     {
         
@@ -373,7 +373,7 @@ public class Ohj1htPeli : PhysicsGame
     /// <param name="hahmo"> Olio, jolle luodaan nyrkkioliot. </param>
     /// <param name="offSet"> Nyrkkiolion sijainnin poikkeama. </param>
     /// <param name="taulukkoIndeksi"> Nyrkkiolion grafiikat. </param>
-    /// <returns></returns>
+    /// <returns> Palauttaa nyrkkiolion. </returns>
     private PlatformCharacter LuoNyrkki(PlatformCharacter hahmo, int offSet, int taulukkoIndeksi)
     {
         _nyrkki = new PlatformCharacter(60, 60);
@@ -689,7 +689,7 @@ public class Ohj1htPeli : PhysicsGame
     /// </summary>
     /// <param name="x"> Pistelaskurin sijainti x-akselilla </param>
     /// <param name="y"> Pistelaskurin sijainti y-akselilla </param>
-    /// <returns></returns>
+    /// <returns> Palauttaa laskuriolion. </returns>
     private IntMeter LuoPisteLaskuri(double x, double y)
     {
         
@@ -760,7 +760,7 @@ public class Ohj1htPeli : PhysicsGame
     /// <param name="otsikkoVari"> Otsikko-olion tekstin väri. </param>
     /// <param name="otsikkoKoko"> Otsikko-olion mitta eli koko. </param>
     /// <param name="otsikkoKorostus"> Otsikko-olion tekstin ominaisuus. </param>
-    /// <returns></returns>
+    /// <returns> Palauttaa otsikko olion. </returns>
     private Label LuoOtsikko(string otsikkoTeksti, string otsikkoPisteet, int otsikkoY, Color otsikkoVari, int otsikkoKoko, bool otsikkoKorostus)
     {
         Label otsikko = new Label(otsikkoTeksti + otsikkoPisteet);    
@@ -776,7 +776,7 @@ public class Ohj1htPeli : PhysicsGame
     ///  Kategoria: ELEMENTTI | Aliohjelma, joka palauttaa räjähdysolion.
     /// </summary>
     /// <param name="olio"> Olio, jonka sijainti otetaan räjähdysefektin sijainniksi. </param>
-    /// <returns></returns>
+    /// <returns> Palauttaa räjähdysolion. </returns>
     private Explosion LuoRajahdys(PhysicsObject olio)
     {
         Explosion rajahdys = new Explosion(50);
